@@ -31,14 +31,4 @@ public class Board {
                 ((board & (1 << 5)) != 0 ? "1" : "0"));
     }
     // New method to check if a move is valid
-
-
-
-    // Set initial empty hole
-    public void Move(int pos) {
-        if (pos >= 0 && pos <= 5) {
-            board &= ~(1 << pos); // Clear the bit at pos
-        }
-    }
-
 }
