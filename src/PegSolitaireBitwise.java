@@ -13,7 +13,7 @@ public class PegSolitaireBitwise {
         allSolutions = new HashMap<>();
         ALL_MOVES = new Move[15][];
         initAllMoves(); // fills ALL_MOVES[][]
-        computeAllSolutionsFromEveryStart();
+        loadSolutionsFromFile("solutions");
     }
 
     private void initAllMoves() {
@@ -145,5 +145,19 @@ public class PegSolitaireBitwise {
             System.err.println("Failed to write file: " + e.getMessage());
         }
     }
-
+    public void loadSolutionsFromFile(String filename) {
+        scoreMemo.clear();
+        try (java.util.Scanner in = new java.util.Scanner(new java.io.File(filename))) {
+            while (in.hasNextLine()) {
+                String line = in.nextLine();
+                String[] parts = line.split(",");
+                int board = Integer.parseInt(parts[0]);
+                int score = Integer.parseInt(parts[1]);
+                scoreMemo.put(board, score);
+            }
+            System.out.println("Solutions loaded from " + filename);
+        } catch (Exception e) {
+            System.err.println("Failed to load file: " + e.getMessage());
+        }
+    }
 }
