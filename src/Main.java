@@ -5,9 +5,8 @@ public class Main {
         p.firstMove();
         p.printBoard();
         p.printBestCaseFromCurrentBoard();
-
-
-
-
+        p.move();
+        p.printBoard();
+        p.printBestCaseFromCurrentBoard();
     }
 }

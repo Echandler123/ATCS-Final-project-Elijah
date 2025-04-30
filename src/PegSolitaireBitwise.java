@@ -13,7 +13,7 @@ public class PegSolitaireBitwise {
         allSolutions = new HashMap<>();
         ALL_MOVES = new Move[15][];
         initAllMoves(); // fills ALL_MOVES[][]
-        loadSolutionsFromFile("solutions");
+        loadSolutionsFromFile("src/solutions");
     }
 
     private void initAllMoves() {
@@ -78,39 +78,7 @@ public class PegSolitaireBitwise {
         }
     }
 
-    private void computeAllSolutionsFromEveryStart() {
-        scoreMemo.clear();
-        for (int missing = 0; missing < 15; missing++) {
-            int startBoard = (1 << 15) - 1;
-            startBoard &= ~(1 << missing);
-            evaluateAndCacheAll(startBoard);
-        }
-    }
 
-    private int evaluateAndCacheAll(int board) {
-        if (scoreMemo.containsKey(board)) {
-            return scoreMemo.get(board);
-        }
-
-        List<Move> validMoves = getValidMoves(board);
-        if (validMoves.isEmpty()) {
-            int pegCount = Integer.bitCount(board);
-            scoreMemo.put(board, pegCount);
-            return pegCount;
-        }
-
-        int best = Integer.MAX_VALUE;
-        for (Move m : validMoves) {
-            int next = applyMove(board, m);
-            if (next != -1) {
-                int result = evaluateAndCacheAll(next);
-                best = Math.min(best, result);
-            }
-        }
-
-        scoreMemo.put(board, best);
-        return best;
-    }
 
     private int applyMove(int b, Move m) {
         if (((b >> m.from) & 1) == 1 && ((b >> m.over) & 1) == 1 && ((b >> m.to) & 1) == 0) {
@@ -160,4 +128,27 @@ public class PegSolitaireBitwise {
             System.err.println("Failed to load file: " + e.getMessage());
         }
     }
+    public void move() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter move as three numbers (from over to), each between 0 and 14:");
+        try {
+            int from = scanner.nextInt();
+            int over = scanner.nextInt();
+            int to = scanner.nextInt();
+
+            Move attempted = new Move(from, over, to);
+            int newBoard = applyMove(board, attempted);
+
+            if (newBoard != -1) {
+                board = newBoard;
+                System.out.println("Move applied.");
+            } else {
+                System.out.println("Invalid move. Make sure the 'from' and 'over' pegs exist, and 'to' is empty.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter three integers.");
+            scanner.nextLine(); // clear invalid input
+        }
+    }
+
 }
