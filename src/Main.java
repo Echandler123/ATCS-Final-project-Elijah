@@ -1,12 +1,7 @@
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
-        PegSolitaireBitwise p = new PegSolitaireBitwise();
-        p.printBoard();
-        p.firstMove();
-        p.printBoard();
-        p.printBestCaseFromCurrentBoard();
-        p.move();
-        p.printBoard();
-        p.printBestCaseFromCurrentBoard();
+        SwingUtilities.invokeLater(() -> new GameViewer());
     }
 }
