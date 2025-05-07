@@ -1,12 +1,10 @@
 import java.util.*;
 
 public class PegSolitaireBitwise {
-
     int board;
     private Map<Integer, Integer> scoreMemo;
     private Map<Integer, Integer> allSolutions;
     private Move[][] ALL_MOVES;
-
     public PegSolitaireBitwise() {
         board = (1 << 15) - 1; // All pegs on
         scoreMemo = new HashMap<>();
@@ -15,7 +13,6 @@ public class PegSolitaireBitwise {
         initAllMoves(); // fills ALL_MOVES[][]
         loadSolutionsFromFile("src/solutions");
     }
-
     private void initAllMoves() {
         List<Move>[] temp = new List[15];
         for (int i = 0; i < 15; i++) {
@@ -45,7 +42,6 @@ public class PegSolitaireBitwise {
             ALL_MOVES[i] = temp[i].toArray(new Move[0]);
         }
     }
-
     public void firstMove() {
         System.out.println("Enter the number (1–15) of the peg to remove:");
         Scanner scanner = new Scanner(System.in);
@@ -57,7 +53,6 @@ public class PegSolitaireBitwise {
         }
 
     }
-
     public void printBoard() {
         System.out.printf("      %2s\n", pegChar(0));
         System.out.printf("     %2s %2s\n", pegChar(1), pegChar(2));
@@ -65,8 +60,6 @@ public class PegSolitaireBitwise {
         System.out.printf("  %2s %2s %2s %2s\n", pegChar(6), pegChar(7), pegChar(8), pegChar(9));
         System.out.printf(" %2s %2s %2s %2s %2s\n", pegChar(10), pegChar(11), pegChar(12), pegChar(13), pegChar(14));
     }
-
-
     private String pegChar(int pos) {
         return ((board & (1 << pos)) != 0) ? String.valueOf(pos + 1) : "0";
     }
@@ -211,13 +204,11 @@ public class PegSolitaireBitwise {
     public int getBoard() {
         return board;
     }
-
     public void removeFirstPeg(int pos) {
         if (pos >= 0 && pos <= 14) {
             board &= ~(1 << pos);
         }
     }
-
     public boolean tryMove(int from, int over, int to) {
         Move move = new Move(from, over, to);
         int newBoard = applyMove(board, move);
@@ -227,7 +218,6 @@ public class PegSolitaireBitwise {
         }
         return false;
     }
-
     public String getBestCaseText() {
         int best = scoreMemo.getOrDefault(board, -1);
         if (best == -1) {
@@ -235,8 +225,4 @@ public class PegSolitaireBitwise {
         }
         return "Best possible: " + best + " peg(s) left";
     }
-
-
-
-
 }

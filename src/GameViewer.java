@@ -88,8 +88,8 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
             return;
         }
 
-        // Peg must exist to be selectable
-        if (((game.getBoard() >> clicked) & 1) == 0) return;
+        // If 3 pegs already selected, ignore further input until reset
+        if (selectedPegs.size() >= 3) return;
 
         // Deselect if already selected
         if (selectedPegs.contains(clicked)) {
@@ -98,11 +98,19 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
             return;
         }
 
-        if (selectedPegs.size() < 3) {
-            selectedPegs.add(clicked);
-        }
+        // Determine selection role (from, over, to)
+        int bit = (game.getBoard() >> clicked) & 1;
 
-        if (selectedPegs.size() == 3) {
+        if (selectedPegs.size() < 2) {
+            // First and second pegs (from and over) must be present
+            if (bit == 0) return;
+            selectedPegs.add(clicked);
+        } else if (selectedPegs.size() == 2) {
+            // Third peg (to) must be empty
+            if (bit == 1) return;
+            selectedPegs.add(clicked);
+
+            // Now try the move
             boolean success = game.tryMove(selectedPegs.get(0), selectedPegs.get(1), selectedPegs.get(2));
             selectedPegs.clear();
             if (!success) {
@@ -112,6 +120,7 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
 
         repaint();
     }
+
 
     private int getClickedPeg(int mx, int my) {
         for (int i = 0; i < pegCoords.length; i++) {
@@ -139,7 +148,4 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
 
-    public static void main(String[] args) {
-        new GameViewer();
-    }
 }
