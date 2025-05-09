@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -75,53 +76,6 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
         }
         return sb.toString();
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        int clicked = getClickedPeg(e.getX(), e.getY());
-        if (clicked == -1) return;
-
-        // First peg to remove
-        if (Integer.bitCount(game.getBoard()) == 15) {
-            game.removeFirstPeg(clicked);
-            repaint();
-            return;
-        }
-
-        // If 3 pegs already selected, ignore further input until reset
-        if (selectedPegs.size() >= 3) return;
-
-        // Deselect if already selected
-        if (selectedPegs.contains(clicked)) {
-            selectedPegs.remove((Integer) clicked);
-            repaint();
-            return;
-        }
-
-        // Determine selection role (from, over, to)
-        int bit = (game.getBoard() >> clicked) & 1;
-
-        if (selectedPegs.size() < 2) {
-            // First and second pegs (from and over) must be present
-            if (bit == 0) return;
-            selectedPegs.add(clicked);
-        } else if (selectedPegs.size() == 2) {
-            // Third peg (to) must be empty
-            if (bit == 1) return;
-            selectedPegs.add(clicked);
-
-            // Now try the move
-            boolean success = game.tryMove(selectedPegs.get(0), selectedPegs.get(1), selectedPegs.get(2));
-            selectedPegs.clear();
-            if (!success) {
-                JOptionPane.showMessageDialog(this, "Invalid move. Try again.");
-            }
-        }
-
-        repaint();
-    }
-
-
     private int getClickedPeg(int mx, int my) {
         for (int i = 0; i < pegCoords.length; i++) {
             int x = pegCoords[i][0];
@@ -132,6 +86,62 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
         }
         return -1;
     }
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int clicked = getClickedPeg(e.getX(), e.getY());
+        if (clicked == -1) return;
+
+        int board = game.getBoard();
+        boolean isPeg = ((board >> clicked) & 1) == 1;
+
+        // First peg to remove
+        if (Integer.bitCount(board) == 15) {
+            if (isPeg) {
+                game.removeFirstPeg(clicked);
+                repaint();
+            }
+            return;
+        }
+
+        // Deselect if already selected
+        if (selectedPegs.contains(clicked)) {
+            selectedPegs.remove((Integer) clicked);
+            repaint();
+            return;
+        }
+
+        // Prevent selecting more than 3
+        if (selectedPegs.size() >= 3) return;
+
+        // Add selected peg/hole
+        selectedPegs.add(clicked);
+
+        // Once 3 selections made, validate them as a move
+        if (selectedPegs.size() == 3) {
+            int from = selectedPegs.get(0);
+            int over = selectedPegs.get(1);
+            int to = selectedPegs.get(2);
+
+            // Check if this exact move exists in valid moves for current board
+            boolean valid = game.getValidMoves(game.getBoard()).stream()
+                    .anyMatch(m -> m.from == from && m.over == over && m.to == to);
+
+
+            if (valid) {
+                game.tryMove(from, over, to);
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid move. Try again.");
+            }
+            selectedPegs.clear();
+        }
+
+        repaint();
+    }
+
+
+
+
+
 
     @Override
     public void keyPressed(KeyEvent e) {

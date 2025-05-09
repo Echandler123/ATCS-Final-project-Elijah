@@ -86,7 +86,7 @@ public class PegSolitaireBitwise {
         return -1;
     }
 
-    private List<Move> getValidMoves(int b) {
+    List<Move> getValidMoves(int b) {
         List<Move> moves = new ArrayList<>();
         for (int from = 0; from < 15; from++) {
             for (Move m : ALL_MOVES[from]) {
