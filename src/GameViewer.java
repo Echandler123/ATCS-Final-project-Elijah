@@ -11,6 +11,7 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
     private final int fHeight = 700;
     private Image pegImage;
     private Image selectedImage;
+    private Image emptyImg;
     private final int[][] pegCoords = {
             {400, 100},        // 0
             {360, 160}, {440, 160},             // 1–2
@@ -24,7 +25,9 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
     public GameViewer() {
         game = new PegSolitaireBitwise();
         pegImage = new ImageIcon("Resources/peg.png").getImage();
-        selectedImage = new ImageIcon("Resources/Selected.jpg").getImage();
+        selectedImage = new ImageIcon("Resources/Selected.png").getImage();
+        emptyImg = new ImageIcon("Resources/empty.png").getImage();
+
 
         setTitle("Triangular Peg Solitaire");
         setSize(fWidth, fHeight);
@@ -59,6 +62,9 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
             int y = pegCoords[i][1];
             boolean isPeg = ((board >> i) & 1) == 1;
 
+            // Draw empty image for all valid positions
+            g.drawImage(emptyImg, x - 20, y - 20, 40, 40, this);
+
             if (isPeg) {
                 boolean isSelected = selectedPegs.contains(i);
                 Image img = isSelected ? selectedImage : pegImage;
@@ -66,6 +72,7 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
             }
         }
     }
+
 
     private String selectedPegsToString() {
         if (selectedPegs.isEmpty()) return "none";
@@ -136,6 +143,32 @@ public class GameViewer extends JFrame implements MouseListener, KeyListener {
         }
 
         repaint();
+        checkEndGame();
+    }
+    private void checkEndGame() {
+        if (game.getValidMoves(game.getBoard()).isEmpty()) {
+            int finalPegs = Integer.bitCount(game.getBoard());
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Game over! Pegs remaining: " + finalPegs + "\nBest possible: " + game.getBestCaseText() + "\nPlay again?",
+                    "Game Over",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    new String[]{"Play Again", "Quit"},
+                    "Play Again"
+            );
+
+            if (choice == JOptionPane.YES_OPTION) {
+                // Restart the game
+                game = new PegSolitaireBitwise();
+                selectedPegs.clear();
+                JOptionPane.showMessageDialog(this, "Click a peg to remove to start the game.");
+                repaint();
+            } else {
+                System.exit(0);
+            }
+        }
     }
 
 

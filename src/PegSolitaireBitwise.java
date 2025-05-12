@@ -225,4 +225,6 @@ public class PegSolitaireBitwise {
         }
         return "Best possible: " + best + " peg(s) left";
     }
+
+
 }
